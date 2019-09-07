@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body {
+			background: #2a2a2a;
+			color: white;
+			font-size: 40px;
+		}
+		#start {
+			color: #2a2a2a;
+			border-radius: 10px;
+			border: 1px;
+			width: 268px;
+			height: 100px;
+			text-align: center;
+			background: pink;
+			background: red;
+			cursor: pointer;
+			font-size: 80px;
+		}
+		#rest {
+			background: #eeee66;
+		}
+
+		p {
+			text-align: center;
+		}
+
+		form {
+			text-align: center;
+		}
+		#time, #tomato {
+			color: red
+		}
+		#work {
+			color: #666
+		}
+		#round {
+			font-size: 50px;
+			width: 40px;
+			color: red
+		}
+	</style>
+</head>
+<body>
+	<p>
+		<span id="tomato">Tomato</span><span id="work">Work</span>
+	</p>
+	<p>
+		<span>click</span> <button id="start">Work!</button> <sapn>here</sapn>
+	</p>
+	<p>
+		time remain: <span id="time">00:00</span>
+	</p>
+	<p>
+		<form>
+			round: <input type="text" name="round" id="round" value="0">
+		</form>
+	</p>
+	<p>
+		status: <span id="status">Work</span>
+	</p>
+	<p>
+		<audio id="tip" controls="controls" loop="loop" src="60.mp3"></audio>
+	</p>
+
+
+<script type="text/javascript" src="jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+	var work_time = 60 * 25;
+	var rest_time = 60 * 5;
+	var interval = 1000;
+	var long_rest = 60 * 30;
+	var threshhold = 4;
+	// work_time = 5;
+	// rest_time = 3;
+	// long_rest = 7;
+	// threshhold = 2;
+	var t = work_time; // work seconds
+	var status = "working"
+	var timeout = interval * t;
+	var c;
+	
+	$(function() {
+
+		var xs = $("#tip")[0];
+		xs.volume = 0.8;
+
+		$("#start").click(function(e) {
+			$("#start").hide();
+			var round = parseInt($("#round").val());
+			if (status == "working" && round < 4) {
+					$("#round").val(round + 1);
+			}
+			$("#tip")[0].pause();
+			setTimeout(function () {
+				var t = $("#tip")[0];
+				t.play();
+				
+			}, timeout);
+			c = setInterval(function() {
+				showTime(round + 1);
+			}, interval);
+		});
+	});
+</script>
+<script type="text/javascript">
+
+
+	function showTime(round) {
+		var s = t % 60;
+		if (s < 10) {
+			s = "0" + s;
+		}
+		var m = Math.floor(t / 60);
+		if (m < 10) {
+			m = "0" + m;
+		}
+		var tt = m + ":" + s;
+		t = t - 1;
+		$("#time")[0].innerHTML = tt
+		if (t < 0) {
+			clearInterval(c);
+			$("#start").show();
+			if (status == "working") {
+				setStatus("Rest", rest_time, "resting");
+			} else {
+				if (round <= threshhold) {
+					setStatus("Work", work_time, "working");
+				} else {
+					$("#round").val(0);
+					setStatus("L Rest", long_rest, "resting");
+				}
+			}
+		}
+	}
+
+	function setStatus(html, time, s) {
+		$("#start")[0].innerHTML = html;
+		t = time;
+		timeout = interval * t;
+		status = s;
+		$("#status")[0].innerHTML = html;
+	}
+
+</script>
+</body>
+</html>
